@@ -12,6 +12,29 @@ function GameBoard() {
 
     const getBoard = () => board;
 
+    const checkWin = (mark) => {
+        for (let i = 0; i < 3; i++) {
+            if (board.every((row) => row[i].getValue() === mark)) return true;
+        }
+        for (let j = 0; j < 3; j++) {
+            if (board[j].every((cell) => cell.getValue() === mark)) return true;
+        }
+
+        if (
+            board[0][0].getValue() === mark &&
+            board[1][1].getValue() === mark &&
+            board[2][2].getValue() === mark
+        ) return true;
+
+        if (
+            board[2][0].getValue() === mark &&
+            board[1][1].getValue() === mark &&
+            board[0][2].getValue() === mark
+        ) return true;
+
+        return false;
+    }
+
     const markCell = (row, column, mark) => {
         const isCellAvailable = board[row][column].getValue() ? false : true;
         console.log(board[row][column].getValue())
@@ -29,7 +52,8 @@ function GameBoard() {
     return {
         getBoard,
         markCell,
-        printBoard
+        printBoard,
+        checkWin
     }
 
 }
@@ -83,11 +107,31 @@ function GameController() {
             `${getActivePlayer().name} Marking into ${rowNames[row]} ${columnNames[column]}`
         console.log(message);
         board.markCell(row, column, getActivePlayer().mark);
+        if (board.checkWin(activePlayer.mark)) {
+            console.log("Player: " + activePlayer.name + " Wins");
+            return;
+        };
         switchActivePlayer();
         printNewRound();
     };
 
     printNewRound();
+
+    //testing
+    // p1 wins
+    // playRound(0, 0);
+    // playRound(0, 1);
+    // playRound(1, 1);
+    // playRound(0, 2);
+    // playRound(2, 2);
+
+    //p2 wins
+    playRound(0, 1);
+    playRound(0, 0);
+    playRound(1, 2);
+    playRound(1, 1);
+    playRound(0, 2);
+    playRound(2, 2);
 
     return { playRound, getActivePlayer }
 }
