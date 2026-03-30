@@ -12,47 +12,43 @@ function GameBoard() {
 
     const getBoard = () => board;
 
-    const checkWin = (mark) => {
-        for (let i = 0; i < 3; i++) {
-            if (board.every((row) => row[i].getValue() === mark)) return true;
+    const isBoardFull = () => {
+        return board.every(row => row.every(cell => cell.getValue() !== ""));
+    }
+
+    const checkWin = (player) => {
+        for (let i = 0; i < rows; i++) {
+            if (board.every((row) => row[i].getValue() === player.mark)) return { status: "win", winner: player.name };
         }
-        for (let j = 0; j < 3; j++) {
-            if (board[j].every((cell) => cell.getValue() === mark)) return true;
+        for (let j = 0; j < columns; j++) {
+            if (board[j].every((cell) => cell.getValue() === player.mark)) return { status: "win", winner: player.name };
         }
 
         if (
-            board[0][0].getValue() === mark &&
-            board[1][1].getValue() === mark &&
-            board[2][2].getValue() === mark
-        ) return true;
+            (
+                board[0][0].getValue() === player.mark &&
+                board[1][1].getValue() === player.mark &&
+                board[2][2].getValue() === player.mark
+            ) || (
+                board[2][0].getValue() === player.mark &&
+                board[1][1].getValue() === player.mark &&
+                board[0][2].getValue() === player.mark
+            )) return { status: "win", winner: player.name };
 
-        if (
-            board[2][0].getValue() === mark &&
-            board[1][1].getValue() === mark &&
-            board[0][2].getValue() === mark
-        ) return true;
-
-        return false;
+        if (isBoardFull()) return { status: "draw", winner: null };
+        return { status: "in progress", winner: null };
     }
 
     const markCell = (row, column, mark) => {
-        const isCellAvailable = board[row][column].getValue() ? false : true;
-        console.log(board[row][column].getValue())
-        if (!isCellAvailable) return;
+        const isCellAvailable = !board[row][column].getValue();
+        if (!isCellAvailable) return false;
         board[row][column].addMarker(mark);
-    };
-
-    const printBoard = () => {
-        const boardWithCellValues = board.map((row) =>
-            row.map((cell) => cell.getValue())
-        );
-        console.log(boardWithCellValues);
+        return true;
     };
 
     return {
         getBoard,
         markCell,
-        printBoard,
         checkWin
     }
 
@@ -70,10 +66,11 @@ function Cell() {
     };
 }
 
-function GameController() {
-    playerOneName = "playerOneName";
-    playerTwoName = "playerTwoName";
-
+function GameController(
+    playerOneName = "Red",
+    playerTwoName = "Blu"
+) {
+    let gameState = { status: "in progress", winner: null };
     const board = GameBoard();
 
     const players = [
@@ -89,51 +86,69 @@ function GameController() {
 
     let activePlayer = players[0];
 
-    const rowNames = ["top", "center", "bottom"];
-    const columnNames = ["left", "middle", "right"];
+    const getGameState = () => gameState;
 
     const switchActivePlayer = () => activePlayer = activePlayer === players[0] ? players[1] : players[0];
 
     const getActivePlayer = () => activePlayer;
 
-    const printNewRound = () => {
-        board.printBoard();
-        console.log(`${getActivePlayer().name}'s turn.`);
-    };
-
     const playRound = (row, column) => {
-        message = (row === 1 && column === 1) ?
-            `${getActivePlayer().name} Marking into ${rowNames[1]}` :
-            `${getActivePlayer().name} Marking into ${rowNames[row]} ${columnNames[column]}`
-        console.log(message);
-        board.markCell(row, column, getActivePlayer().mark);
-        if (board.checkWin(activePlayer.mark)) {
-            console.log("Player: " + activePlayer.name + " Wins");
-            return;
-        };
+        if (gameState.status !== "in progress") return;
+
+        const player = getActivePlayer();
+
+        if (!board.markCell(row, column, player.mark)) return;
+
+        gameState = board.checkWin(player);
+
         switchActivePlayer();
-        printNewRound();
     };
 
-    printNewRound();
-
-    //testing
-    // p1 wins
-    // playRound(0, 0);
-    // playRound(0, 1);
-    // playRound(1, 1);
-    // playRound(0, 2);
-    // playRound(2, 2);
-
-    //p2 wins
-    playRound(0, 1);
-    playRound(0, 0);
-    playRound(1, 2);
-    playRound(1, 1);
-    playRound(0, 2);
-    playRound(2, 2);
-
-    return { playRound, getActivePlayer }
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameState }
 }
 
-const game = GameController();
+function ScreenController() {
+    const game = GameController();
+    const activePlayerDisplay = document.querySelector(".turn");
+    const boardDisplay = document.querySelector(".board");
+
+    function endGameScreenDisplay() {
+        const message = (game.getGameState().status === "win") ?
+            game.getGameState().winner + " wins!" :
+            "Draw.";
+        alert(message);
+    }
+
+    function UpdateScreen() {
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        boardDisplay.textContent = "";
+
+        activePlayerDisplay.textContent = activePlayer.name + "'s turn"
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const newCell = document.createElement("button");
+                newCell.classList.add("cell");
+                newCell.dataset.row = rowIndex;
+                newCell.dataset.column = columnIndex;
+                newCell.textContent = cell.getValue();
+                boardDisplay.append(newCell);
+            });
+        });
+        if (game.getGameState().status !== "in progress") endGameScreenDisplay();
+    }
+    function clickHandlerBoard(e) {
+        const selectedRow = +e.target.dataset.row;
+        const selectedColumn = +e.target.dataset.column;
+
+        if (!e.target.classList.contains("cell")) return;
+
+        game.playRound(selectedRow, selectedColumn);
+        UpdateScreen();
+    }
+    boardDisplay.addEventListener("click", clickHandlerBoard);
+    UpdateScreen();
+}
+
+ScreenController();

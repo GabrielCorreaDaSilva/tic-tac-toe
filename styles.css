@@ -8,3 +8,10 @@ html {
     background-color: rgb(46, 46, 46);
     color: white;
 }
+
+
+.board {
+    display: grid;
+    grid-template-rows: repeat(3, 60px);
+    grid-template-columns: repeat(3, 60px);
+}
