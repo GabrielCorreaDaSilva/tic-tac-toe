@@ -107,8 +107,8 @@ function GameController(
     return { playRound, getActivePlayer, getBoard: board.getBoard, getGameState }
 }
 
-function ScreenController() {
-    const game = GameController();
+function ScreenController(playerOneName, playerTwoName) {
+    const game = GameController(playerOneName, playerTwoName);
     const activePlayerDisplay = document.querySelector(".turn");
     const boardDisplay = document.querySelector(".board");
 
@@ -116,7 +116,10 @@ function ScreenController() {
         const message = (game.getGameState().status === "win") ?
             game.getGameState().winner + " wins!" :
             "Draw.";
-        alert(message);
+        const endScreen = document.querySelector(".result");
+        const gameResultH1 = endScreen.querySelector(".game-result");
+        gameResultH1.textContent = message;
+        endScreen.showModal();
     }
 
     function UpdateScreen() {
@@ -151,4 +154,18 @@ function ScreenController() {
     UpdateScreen();
 }
 
-ScreenController();
+(() => {
+    const startScreen = document.querySelector(".start-game");
+    // console.log(startScreen)
+    startScreen.showModal();
+    const playerOneNameInput = startScreen.querySelector("#player-one-name");
+    const playertwoNameInput = startScreen.querySelector("#player-two-name");
+
+    const startButton = startScreen.querySelector(".start-button");
+    // console.log(startButton)
+    startButton.addEventListener("click", () => {
+        ScreenController(playerOneNameInput.value, playertwoNameInput.value);
+        startScreen.close();
+    });
+})();
+

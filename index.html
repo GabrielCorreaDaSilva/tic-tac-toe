@@ -10,10 +10,36 @@
 </head>
 
 <body>
-    <h1 class="turn"></h1>
-    <div class="board">
+    <div class="content-wrapper">
+
+        <h1 class="turn"></h1>
+        <div class="board">
+        </div>
     </div>
-    <dialog class="result"></dialog>
+    <dialog class="start-game">
+        <h1 class="title">Tic Tac Toe</h1>
+        <hr>
+        <div class="name-input-wrapper">
+            <div>
+                <label for="player-one-name">Player 1:</label>
+                <input type="text" name="player-one-name" id="player-one-name" placeholder="player one name"
+                    value="Red">
+            </div>
+            <div>
+                <label for="player-two-name">Player 2:</label>
+                <input type="text" name="player-two-name" id="player-two-name" placeholder="player two name"
+                    value="Blue">
+            </div>
+        </div>
+        <button class="start-button">Start Game</button>
+    </dialog>
+    <dialog class="result">
+        <h1 class="game-result"></h1>
+        <hr>
+        <button class="new-game">New Game</button>
+    </dialog>
+
+
 </body>
 
 </html>
