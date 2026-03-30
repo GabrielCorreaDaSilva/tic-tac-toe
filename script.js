@@ -3,10 +3,13 @@ function GameBoard() {
     const columns = 3;
     const board = [];
 
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++) {
-            board[i].push(Cell());
+    const newBoard = () => {
+        board.length = 0;
+        for (let i = 0; i < rows; i++) {
+            board[i] = [];
+            for (let j = 0; j < columns; j++) {
+                board[i].push(Cell());
+            }
         }
     }
 
@@ -46,10 +49,13 @@ function GameBoard() {
         return true;
     };
 
+    newBoard();
+
     return {
         getBoard,
         markCell,
-        checkWin
+        checkWin,
+        newBoard
     }
 
 }
@@ -100,11 +106,17 @@ function GameController(
         if (!board.markCell(row, column, player.mark)) return;
 
         gameState = board.checkWin(player);
-
-        switchActivePlayer();
+        if (gameState.status === "in progress")
+            switchActivePlayer();
     };
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameState }
+    const newGame = () => {
+        activePlayer = players[0];
+        board.newBoard();
+        gameState = { status: "in progress", winner: null }
+    }
+
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameState, newGame }
 }
 
 function ScreenController(playerOneName, playerTwoName) {
@@ -112,12 +124,13 @@ function ScreenController(playerOneName, playerTwoName) {
     const activePlayerDisplay = document.querySelector(".turn");
     const boardDisplay = document.querySelector(".board");
 
+    const endScreen = document.querySelector(".result");
+    const gameResultH1 = endScreen.querySelector(".game-result");
+
     function endGameScreenDisplay() {
         const message = (game.getGameState().status === "win") ?
             game.getGameState().winner + " wins!" :
             "Draw.";
-        const endScreen = document.querySelector(".result");
-        const gameResultH1 = endScreen.querySelector(".game-result");
         gameResultH1.textContent = message;
         endScreen.showModal();
     }
@@ -151,21 +164,26 @@ function ScreenController(playerOneName, playerTwoName) {
         UpdateScreen();
     }
     boardDisplay.addEventListener("click", clickHandlerBoard);
+    const newGamebtn = endScreen.querySelector(".new-game");
+    newGamebtn.addEventListener("click", () => {
+        game.newGame();
+        endScreen.close();
+        UpdateScreen();
+    });
     UpdateScreen();
 }
 
 (() => {
     const startScreen = document.querySelector(".start-game");
-    // console.log(startScreen)
     startScreen.showModal();
     const playerOneNameInput = startScreen.querySelector("#player-one-name");
     const playertwoNameInput = startScreen.querySelector("#player-two-name");
 
     const startButton = startScreen.querySelector(".start-button");
-    // console.log(startButton)
     startButton.addEventListener("click", () => {
         ScreenController(playerOneNameInput.value, playertwoNameInput.value);
         startScreen.close();
     });
+
 })();
 
