@@ -5,23 +5,25 @@
 }
 
 :root {
-    --primary-color: light-dark(#ffffff, #2e2e2e);
+    --primary-color: light-dark(#efefef, #2e2e2e);
     --secondary-color: light-dark(#000000, #A79277);
+    --beige: #A79277;
     --white-black: light-dark(#ffffff, #1a1a1a);
     --black-white: light-dark(#1a1a1a, #ffffff);
     --button-dgray-lgray: light-dark(#1a1a1a, #6c6c6c);
-    /* color-scheme: light dark; */
-    color-scheme: dark;
+    --background: light-dark(#bbbab7, #1a1a1a);
+    color-scheme: light dark;
 }
 
 html {
-    background-color: var(--white-black);
+    background-color: var(--background);
     color: white;
     height: 100vh;
     width: 100vw;
     display: flex;
     align-items: center;
     justify-items: center;
+    transition: all 0.5s ease;
 }
 
 body {
@@ -51,14 +53,13 @@ body {
 }
 
 .icon {
-    fill: white;
+    fill: var(--black-white);
     height: 65%;
     width: 65%;
 }
 
 .content-wrapper {
     text-align: center;
-    flex-shrink: 0;
 }
 
 .turn {
@@ -92,12 +93,12 @@ dialog[open] {
     margin: auto;
     padding: 60px;
     background-color: var(--primary-color);
-    color: light-dark(white, var(--black-white));
+    color: var(--black-white);
     border: 2px solid var(--secondary-color);
 }
 
+
 hr {
-    /* border: 1px solid var(--primary-color); */
     border: 1px solid var(--secondary-color);
     opacity: 0.7;
     border-radius: 2px;
@@ -133,15 +134,24 @@ label {
     padding: 12px 20px;
     border-radius: 6px;
     border: 2px solid transparent;
-    background-color: var(--button-dgray-lgray);
+    color: var(--white-black);
+    background-color: var(--beige);
 }
 
 .start-button:hover,
 .new-game:hover {
-    border: 2px solid var(--secondary-color);
+    border: 2px solid var(--black-white);
 }
 
 ::backdrop {
     background-color: black;
     opacity: 0.5;
+}
+
+:root.dark {
+    color-scheme: dark;
+}
+
+:root.light {
+    color-scheme: light;
 }

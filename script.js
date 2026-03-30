@@ -163,7 +163,25 @@ function ScreenController(playerOneName, playerTwoName) {
         game.playRound(selectedRow, selectedColumn);
         UpdateScreen();
     }
+    function clickHandlerLightDark() {
+        const root = document.documentElement;
+        if (root.classList.contains("dark")) {
+            document.documentElement.classList.remove("dark");
+            root.classList.add("light");
+            return;
+        } else if (root.classList.contains("light")) {
+            document.documentElement.classList.remove("light");
+            root.classList.add("dark");
+            return;
+        }
+        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        root.classList.add(isDark ? "light" : "dark");
+    }
+    const toggleTheme = document.querySelector(".dark-light-switch");
+    toggleTheme.addEventListener("click", clickHandlerLightDark);
+
     boardDisplay.addEventListener("click", clickHandlerBoard);
+
     const newGamebtn = endScreen.querySelector(".new-game");
     newGamebtn.addEventListener("click", () => {
         game.newGame();
